@@ -216,6 +216,8 @@ class StreamDeckServer:
                 "serial_number": serial_number,
                 "type": streamdeck.deck_type(),
                 "layout": streamdeck.key_layout(),
+                "screensize": streamdeck.touchscreen_size(),
+                "dials": streamdeck.dial_count(),
             }
         )
 
@@ -322,6 +324,14 @@ class StreamDeckServer:
     def get_deck_layout(self, serial_number: str) -> Tuple[int, int]:
         """Returns a tuple containing the number of rows and columns for the specified Stream Deck"""
         return self.decks_by_serial[serial_number].key_layout()
+
+    def get_deck_screen_size(self, serial_number: str) -> Tuple[int, int]:
+        """Returns a tuple containing the vertical and horizontal pixels for the specified Stream Deck's touch screen"""
+        return self.decks_by_serial[serial_number].touchscreen_size()
+    
+    def get_deck_dials(self, serial_number: str) -> int:
+        """Returns the number of dials for the specified Stream Deck"""
+        return self.decks_by_serial[serial_number].dial_count()
 
     def _button_state(self, serial_number: str, page: int, button: int, state: Optional[int] = None) -> ButtonState:
         multi_state = self._button_multi_state(serial_number, page, button)
