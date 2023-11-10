@@ -81,6 +81,21 @@ BUTTON_STYLE = """
     border-style: outset;}
 """
 
+DIAL_STYLE = """
+    QToolButton {
+    margin: 2px;
+    border: 2px solid #444444;
+    border-radius: 40px;
+    background-color: #000000;
+    border-style: outset;}
+    QToolButton:checked {
+    margin: 2px;
+    border: 2px solid #cccccc;
+    border-radius: 40px;
+    background-color: #000000;
+    border-style: outset;}
+"""
+
 BUTTON_DRAG_STYLE = """
     QToolButton {
     margin: 2px;
@@ -873,7 +888,7 @@ def browse_github():
     QDesktopServices.openUrl(url)
 
 
-def build_buttons(ui, tab) -> None:
+def build_page(ui, tab) -> None:
     global selected_button
 
     if hasattr(tab, "deck_buttons"):
@@ -898,6 +913,8 @@ def build_buttons(ui, tab) -> None:
     if not deck_id:
         return
     deck_rows, deck_columns = api.get_deck_layout(deck_id)
+    deck_screen_width, deck_screen_height = api.get_deck_screen_size(deck_id)
+    deck_dials = api.get_deck_dials(deck_id)
 
     # Create a new base_widget with tab as it's parent
     # This is effectively a "blank tab"
@@ -930,6 +947,30 @@ def build_buttons(ui, tab) -> None:
             index += 1
 
         column_layout.addStretch(1)
+
+
+    if deck_screen_width > 0 and deck_screen_height > 0:
+        # TODO: render screen
+        print('Screen unimplemented')
+    
+    dials = []
+    if deck_dials > 0:
+        # TODO: should a dials be permanantly attached to it's screen segment?
+        dial_column_layout = QHBoxLayout()
+        row_layout.addLayout(dial_column_layout)
+        for _dial in range(deck_dials):
+            dial = DraggableButton(base_widget, ui, api)
+            dial.setCheckable(True)
+            dial.setProperty("index", index)
+            dial.setSizePolicy(QSizePolicy.Policy.MinimumExpanding, QSizePolicy.Policy.MinimumExpanding)
+            dial.setToolButtonStyle(Qt.ToolButtonStyle.ToolButtonIconOnly)
+            dial.setIconSize(QSize(80, 80))
+            dial.setStyleSheet(DIAL_STYLE)
+            dials.append(dial)
+            dial_column_layout.addWidget(dial)
+            index += 1
+        dial_column_layout.addStretch(1)
+
     row_layout.addStretch(1)
 
     # Note that the button click event captures the ui variable, the current button
@@ -938,7 +979,6 @@ def build_buttons(ui, tab) -> None:
         button.clicked.connect(
             lambda current_button=button, all_buttons=buttons: button_clicked(current_button, all_buttons)
         )
-
 
 def export_config(window, api) -> None:
     file_name = QFileDialog.getSaveFileName(
@@ -998,7 +1038,7 @@ def build_device(ui, _device_index=None) -> None:
             label = _build_tab_label("Page", page_id)
             tab_index = ui.pages.addTab(page, label)
             page_tab = ui.pages.widget(tab_index)
-            build_buttons(ui, page_tab)
+            build_page(ui, page_tab)
             if page_id == current_page:
                 active_tab_index = tab_index
 
