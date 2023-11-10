@@ -13,7 +13,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.12"
-streamdeck = "^0.9.3"
+streamdeck = { git = "https://github.com/admiral0/python-elgato-streamdeck.git", rev = "58e5e1778cc56f4a28268ebff123f16f3135c70f"}
 pillow = "^9.4.0"
 pynput = "^1.7.6"
 pyside6 = "^6.4.2"
